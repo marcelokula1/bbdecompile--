@@ -15,6 +15,8 @@ TagManager:
   - Button
   - Sprite
   - Wall
+  - Projectile
+  - BlueLocker
   layers:
   - Default
   - TransparentFX
@@ -22,7 +24,7 @@ TagManager:
   - Floor
   - Water
   - UI
-  - 
+  - Ceiling
   - 
   - 
   - 

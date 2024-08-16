@@ -720,49 +720,57 @@ private void BossFightBegin()
         this.player.runSpeed = 19f;
     }
 public void NullHit()
+{
+    this.health--;
+
+    // Check if health is at half
+    if (this.health == healthAfterHit / 2 &)
     {
-        this.health--;
-        if (this.health == 9)
+        TransparentMaterial("Ceiling", transparent);
+        TransparentMaterial("Floor", transparent);
+    }
+
+    if (this.health == healthAfterHit)
+    {
+        this.BossFight = false;
+        this.audioDevice.Stop();
+        this.audioDevice.PlayOneShot(this.NULL_Start);
+        this.bossFightMusic.clip = this.Start_BossMusic;
+        this.bossFightMusic.loop = true;
+        this.bossFightMusic.Play();
+        GameObject[] Projetiles = GameObject.FindGameObjectsWithTag("Projectile");
+        foreach (GameObject Projectile in Projetiles)
         {
-            this.BossFight = false;
-            this.audioDevice.Stop();
-            this.audioDevice.PlayOneShot(this.NULL_Start);
-            this.bossFightMusic.clip = this.Start_BossMusic;
-            this.bossFightMusic.loop = true;
-            this.bossFightMusic.Play();
+            Destroy(Projectile);
+        }
+        this.player.holdingObject = false;
+        base.StartCoroutine(this.AfterBossStart());
+        return;
+    }
+    if (this.health < healthAfterHit)
+    {
+        if (this.BossFight)
+        {
+            PlayerIncrease(4f);
+        }
+        if (this.health == 1)
+        {
             GameObject[] Projetiles = GameObject.FindGameObjectsWithTag("Projectile");
             foreach (GameObject Projectile in Projetiles)
             {
                 Destroy(Projectile);
             }
+            this.ProjectileSpawnr.maxObjects = 1f;
+            this.ProjectileSpawnr.objects = 0f;
+            this.ProjectileSpawnr.spawnCooldown = 5f;
             this.player.holdingObject = false;
-            base.StartCoroutine(this.AfterBossStart());
-            return;
         }
-        if (this.health < 9)
+        if (this.health <= 0)
         {
-            if (this.BossFight)
-            {
-                PlayerIncrease(4f);
-            }
-            if (this.health == 1)
-            {
-                GameObject[] Projetiles = GameObject.FindGameObjectsWithTag("Projectile");
-                foreach (GameObject Projectile in Projetiles)
-                {
-                    Destroy(Projectile);
-                }
-                this.ProjectileSpawnr.maxObjects = 1f;
-                this.ProjectileSpawnr.objects = 0f;
-                this.ProjectileSpawnr.spawnCooldown = 5f;
-                this.player.holdingObject = false;
-            }
-            if (this.health <= 0)
-            {
-                SceneManager.LoadScene("END"); // Change this to the scene you want to end up at after the fight is over!
-            }
+            SceneManager.LoadScene("END"); // Change this to the scene you want to end up at after the fight is over!
         }
     }
+}
 
 private IEnumerator AfterBossStart()
     {
@@ -771,6 +779,24 @@ private IEnumerator AfterBossStart()
         yield break;
     }
 
+
+private void TransparentMaterial(string layerName, Material material)
+{
+    int targetLayer = LayerMask.NameToLayer(layerName);
+    GameObject[] allObjects = FindObjectsOfType<GameObject>();
+
+    foreach (GameObject obj in allObjects)
+    {
+        if (obj.layer == targetLayer)
+        {
+            Renderer objRenderer = obj.GetComponent<Renderer>();
+            if (objRenderer != null)
+            {
+                objRenderer.material = newMaterial;
+            }
+        }
+    }
+}
 
 	// Token: 0x040005F7 RID: 1527
 	public CursorControllerScript cursorController;
@@ -1067,6 +1093,7 @@ public BaseItem[] items;
      public NullScript ns;
 
      public int health;
+     public int healthAfterHit;
 
      public bool BossFight;
 
@@ -1084,5 +1111,6 @@ public BaseItem[] items;
      
      public GameObject NullSprite;
      public GameObject BaldiSprite;
-
+     public Material transparent;
+     public NullScript NullScript;
 }
