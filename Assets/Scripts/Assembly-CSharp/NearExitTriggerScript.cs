@@ -13,6 +13,11 @@ public class NearExitTriggerScript : MonoBehaviour
 			this.es.Lower();
 			if (this.gc.baldiScrpt.isActiveAndEnabled) this.gc.baldiScrpt.Hear(base.transform.position, 8f);
 		}
+		else if (this.gc.exitsReached < 4 & this.gc.finaleMode & other.tag == "Player" & this.gc.mode == "NULL")
+		{
+			this.gc.ExitReached();
+			this.es.Lower();
+          }
 	}
 
 	// Token: 0x04000674 RID: 1652

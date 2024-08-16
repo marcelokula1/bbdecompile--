@@ -401,4 +401,6 @@ public class PlayerScript : MonoBehaviour
 
 	// Token: 0x04000717 RID: 1815
     private CameraScript cameraScript;
+
+    public bool holdingObject;
 }

@@ -159,6 +159,10 @@ public class GameControllerScript : MonoBehaviour
 		{
 			this.ActivateFinaleMode();
 		}
+          else if (this.notebooks == this.maxNotebooks & this.mode == "NULL")
+		{
+			this.ActivateFinaleMode();
+		}
 	}
 
 	// Token: 0x06000967 RID: 2407 RVA: 0x00022024 File Offset: 0x00020424
@@ -246,7 +250,19 @@ public void ActivateSpoopMode()
         this.baldiScrpt.timeToMove = TimeToMoveBaldi;
         this.baldiScrpt.baldiAnger = BaldiAnger;
         this.baldiScrpt.baldiSpeedScale = BaldiSpeedScale;
-    }
+        if (this.mode == "NULL")
+        {
+          NullSprite.SetActive(true);
+          BaldiSprite.SetActive(false);
+          this.quarter.SetActive(false);
+          this.crafters.SetActive(false); //Turns on Crafters
+          this.playtime.SetActive(false); //Turns on Playtime
+          this.gottaSweep.SetActive(false); //Turns on Gotta Sweep
+          this.bully.SetActive(false); //Turns on Bully
+          this.firstPrize.SetActive(false); //Turns on First-Prize
+          //this.TestEnemy.SetActive(false); //Turns on Test-Enemy
+        }
+    } 
     else 
     {
         Debug.Log("baldi is not active");
@@ -615,17 +631,17 @@ public void ActivateSpoopMode()
 			this.notebookCount.color = Color.white;
 			this.audioDevice.loop = true;
 			this.audioDevice.Play();
-              if (RedWhenExitReached == true)
-             {
-			RenderSettings.ambientLight = Color.red; //Make everything red and start player the weird sound
+			RenderSettings.ambientLight = color;
 			RenderSettings.skybox = skyBoxRed; //Make skybox red
 			//RenderSettings.fog = true;
-             }
-             else
-             {
-             Debug.Log("no.");
-             } 
+              if (SchoolhouseEscapeMusicExist == true)
+              { 
                audioSource.Stop();
+              }
+              else
+              {
+               Debug.Log("exit music is not here");
+              }
 		}
 		if (this.exitsReached == 2) //Play a sound
 		{
@@ -640,6 +656,13 @@ public void ActivateSpoopMode()
 			this.audioDevice.loop = false;
 			this.audioDevice.Play();
 		}
+        if (this.exitsReached == 4)
+        {
+            this.audioDevice.Stop();
+            RenderSettings.ambientLight = Color.white; // IF YOU DONT WANT THE AMBIENCE COLOR OF YOUR SCENE CHANGE, REMOVE THIS LINE
+            this.audioDevice.PlayOneShot(this.aud_Switch, 0.8f);
+            this.BossFightStart();
+        }
 	}
 
 	// Token: 0x0600097C RID: 2428 RVA: 0x00022CC1 File Offset: 0x000210C1
@@ -656,6 +679,98 @@ public void ActivateSpoopMode()
 		this.player.flipaturn = -1f;
 		Camera.main.GetComponent<CameraScript>().offset = new Vector3(0f, -1f, 0f);
 	}
+    public void BossFightStart()
+    {
+        this.BossFight = true;
+        this.debugMode = true;
+        this.player.runSpeed = this.player.walkSpeed;
+        this.baldiScrpt.enabled = false;
+        this.cs.baldiAgent.Warp(new Vector3(-35f, this.cs.baldi.position.y, 335f)); // Teleport Baldi to X: -35, baldi's Y, Z: 335
+        this.ns.agent.isStopped = true;
+        this.audioDevice.PlayOneShot(this.NullPreIntro);
+        this.bossFightMusic.clip = this.Preintro_BossM;
+        this.bossFightMusic.loop = true;
+        this.bossFightMusic.Play();
+        GameObject[] Items = GameObject.FindGameObjectsWithTag("Item");
+        foreach (GameObject Item in Items)
+        {
+            Item.SetActive(false);
+        }
+        this.player.hud.enabled = false;
+        this.LoseItem(0);
+        this.LoseItem(1);
+        this.LoseItem(2);
+    }
+public void PlayerIncrease(float setSpeed)
+    {
+        this.player.walkSpeed += setSpeed;
+        this.player.runSpeed += setSpeed;
+    }
+private void BossFightBegin()
+    {
+        this.ns.agent.speed = 20f;
+        this.BossFight = true;
+        this.ns.agent.isStopped = false;
+        this.debugMode = false;
+        this.ns.enabled = true;
+        this.bossFightMusic.clip = this.Boss_LoopMusic;
+        this.bossFightMusic.loop = true;
+        this.bossFightMusic.Play();
+        this.player.walkSpeed = 19f;
+        this.player.runSpeed = 19f;
+    }
+public void NullHit()
+    {
+        this.health--;
+        if (this.health == 9)
+        {
+            this.BossFight = false;
+            this.audioDevice.Stop();
+            this.audioDevice.PlayOneShot(this.NULL_Start);
+            this.bossFightMusic.clip = this.Start_BossMusic;
+            this.bossFightMusic.loop = true;
+            this.bossFightMusic.Play();
+            GameObject[] Projetiles = GameObject.FindGameObjectsWithTag("Projectile");
+            foreach (GameObject Projectile in Projetiles)
+            {
+                Destroy(Projectile);
+            }
+            this.player.holdingObject = false;
+            base.StartCoroutine(this.AfterBossStart());
+            return;
+        }
+        if (this.health < 9)
+        {
+            if (this.BossFight)
+            {
+                PlayerIncrease(4f);
+            }
+            if (this.health == 1)
+            {
+                GameObject[] Projetiles = GameObject.FindGameObjectsWithTag("Projectile");
+                foreach (GameObject Projectile in Projetiles)
+                {
+                    Destroy(Projectile);
+                }
+                this.ProjectileSpawnr.maxObjects = 1f;
+                this.ProjectileSpawnr.objects = 0f;
+                this.ProjectileSpawnr.spawnCooldown = 5f;
+                this.player.holdingObject = false;
+            }
+            if (this.health <= 0)
+            {
+                SceneManager.LoadScene("END"); // Change this to the scene you want to end up at after the fight is over!
+            }
+        }
+    }
+
+private IEnumerator AfterBossStart()
+    {
+        yield return new WaitForSeconds(Start_BossMusic.length);
+        this.BossFightBegin();
+        yield break;
+    }
+
 
 	// Token: 0x040005F7 RID: 1527
 	public CursorControllerScript cursorController;
@@ -940,8 +1055,34 @@ public BaseItem[] items;
  
     public bool SchoolhouseEscapeMusicExist;
     public AudioClip SchoolhouseEscapeMusic;
-    public bool RedWhenExitReached;
+    public Color color;
     AudioSource audioSource; 
+    
+    [Header("NULL Settings")]  
 
+     public CraftersScript cs;
+
+     public ProjectileSpawner ProjectileSpawnr;
+
+     public NullScript ns;
+
+     public int health;
+
+     public bool BossFight;
+
+     public AudioClip NullPreIntro;
+
+     public AudioClip NULL_Start;
+
+     public AudioClip Preintro_BossM;
+
+     public AudioClip Start_BossMusic;
+
+     public AudioClip Boss_LoopMusic;
+
+     public AudioSource bossFightMusic;
+     
+     public GameObject NullSprite;
+     public GameObject BaldiSprite;
 
 }
