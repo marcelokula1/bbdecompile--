@@ -38,6 +38,11 @@ public class GameControllerScript : MonoBehaviour
           {
           Student.SetActive(true);
           }
+          if (this.mode == "NULL")
+          {
+           this.baldiTutor.SetActive(false); //Turns off Baldi(The one that you see at the start of the game)
+           this.MusicPlayersAll.SetActive(false);
+          } 
 	}
 
 	// Token: 0x06000965 RID: 2405 RVA: 0x00021B5C File Offset: 0x0001FF5C
@@ -152,7 +157,7 @@ public class GameControllerScript : MonoBehaviour
 		}
 		else
 		{
-			this.notebookCount.text = this.notebooks.ToString() + " Notebooks";
+			this.notebookCount.text = this.notebooks.ToString();
 			//this.notebookCount.text = "Notebooks Found: " + this.notebooks.ToString();
 		}
 		if (this.notebooks == this.maxNotebooks & this.mode == "story")
@@ -161,7 +166,7 @@ public class GameControllerScript : MonoBehaviour
 		}
           else if (this.notebooks == this.maxNotebooks & this.mode == "NULL")
 		{
-			this.ActivateFinaleMode();
+			this.NULLFinaleMode();
 		}
 	}
 
@@ -309,6 +314,24 @@ public void ActivateSpoopMode()
            audioSource.Play();
           }
 	}
+
+	private void NULLFinaleMode()
+	{
+		this.finaleMode = true;
+		this.entrance_0.Raise(); //Raise all the enterances(make them appear)
+		this.entrance_1.Raise();
+		this.entrance_3.Raise();
+          if (exitsReached == 3 & this.mode == "NULL")
+          {
+		  this.entrance_2.Raise();
+          }
+          else
+          {
+
+          }
+	}
+
+
 
 	// Token: 0x0600096F RID: 2415 RVA: 0x000221F4 File Offset: 0x000205F4
 	public void GetAngry(float value) //Make Baldi get angry
@@ -634,14 +657,6 @@ public void ActivateSpoopMode()
 			RenderSettings.ambientLight = color;
 			RenderSettings.skybox = skyBoxRed; //Make skybox red
 			//RenderSettings.fog = true;
-              if (SchoolhouseEscapeMusicExist == true)
-              { 
-               audioSource.Stop();
-              }
-              else
-              {
-               Debug.Log("exit music is not here");
-              }
 		}
 		if (this.exitsReached == 2) //Play a sound
 		{
@@ -650,12 +665,13 @@ public void ActivateSpoopMode()
 			this.audioDevice.loop = true;
 			this.audioDevice.Play();
 		}
-		if (this.exitsReached == 3) //Play a even louder sound
+          if (this.exitsReached == 3) 
 		{
 			this.audioDevice.clip = this.aud_MachineRev;
 			this.audioDevice.loop = false;
 			this.audioDevice.Play();
 		}
+  
         if (this.exitsReached == 4)
         {
             this.audioDevice.Stop();
@@ -724,7 +740,7 @@ public void NullHit()
     this.health--;
 
     // Check if health is at half
-    if (this.health == healthAfterHit / 2 &)
+    if (this.health == healthAfterHit / 2 & FloorAndCeiling == true)
     {
         TransparentMaterial("Ceiling", transparent);
         TransparentMaterial("Floor", transparent);
@@ -792,11 +808,12 @@ private void TransparentMaterial(string layerName, Material material)
             Renderer objRenderer = obj.GetComponent<Renderer>();
             if (objRenderer != null)
             {
-                objRenderer.material = newMaterial;
+                objRenderer.material = transparent;
             }
         }
     }
 }
+
 
 	// Token: 0x040005F7 RID: 1527
 	public CursorControllerScript cursorController;
@@ -1085,7 +1102,7 @@ public BaseItem[] items;
     AudioSource audioSource; 
     
     [Header("NULL Settings")]  
-
+     public GameObject MusicPlayersAll;
      public CraftersScript cs;
 
      public ProjectileSpawner ProjectileSpawnr;
@@ -1113,4 +1130,5 @@ public BaseItem[] items;
      public GameObject BaldiSprite;
      public Material transparent;
      public NullScript NullScript;
+     public bool FloorAndCeiling;
 }
