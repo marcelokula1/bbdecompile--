@@ -17,6 +17,8 @@ TagManager:
   - Wall
   - Projectile
   - BlueLocker
+  - Floor
+  - Ceiling
   layers:
   - Default
   - TransparentFX

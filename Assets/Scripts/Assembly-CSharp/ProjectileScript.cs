@@ -3,7 +3,9 @@ using UnityEngine;
 
 public class ProjectileScript : MonoBehaviour
 {
-    private GameObject player;
+    private PlayerScript player;
+
+    private GameObject cm;
 
     public bool pickedUp;
 
@@ -13,20 +15,21 @@ public class ProjectileScript : MonoBehaviour
 
     private void Start()
     {
-        rb = GetComponent<Rigidbody>();
-        player = GameObject.FindWithTag("Player");
-        this.GetComponent<BsodaSparyScript>().enabled = false;
+        rb = base.GetComponent<Rigidbody>();
+        player = GameObject.FindWithTag("Player").GetComponent<PlayerScript>();
+        cm = GameObject.FindWithTag("MainCamera");
+        base.GetComponent<BsodaSparyScript>().enabled = false;
     }
 
     private void Update()
     {
-        if (pickedUp)
+        if (this.pickedUp)
         {
             if (Input.GetMouseButtonDown(0) && Time.timeScale != 0f)
             {
-                pickedUp = false;
-                Thrown = true;
-                this.player.GetComponent<PlayerScript>().holdingObject = false;
+                this.pickedUp = false;
+                this.Thrown = true;
+                this.player.holdingObject = false;
             }
             if (this.Thrown)
             {
@@ -37,22 +40,30 @@ public class ProjectileScript : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.tag == "Player" && !pickedUp & !Thrown)
+        if (other.tag == "Player" && !this.pickedUp & !this.Thrown)
         {
-            if (!this.player.GetComponent<PlayerScript>().holdingObject)
+            if (!this.player.holdingObject)
             {
-                this.player.GetComponent<PlayerScript>().holdingObject = true;
+                this.player.holdingObject = true;
                 this.pickedUp = true;
             }
         }
     }
 
     private void LateUpdate()
-	{
-		if (this.pickedUp)
-		{
-			base.transform.position = this.player.transform.position + this.player.transform.forward * 2f + Vector3.up * -2f;
-			base.transform.rotation = this.player.transform.rotation;
-		}
-	}
+    {
+        if (this.pickedUp && !this.Thrown)
+        {
+            if (!Input.GetButton("Look Behind"))
+            {
+                base.transform.position = this.player.transform.position + this.player.transform.forward * 3f + Vector3.up * -2f;
+                base.transform.rotation = this.cm.transform.rotation;
+            }
+            else
+            {
+                base.transform.position = this.player.transform.position + this.player.transform.forward * -3f + Vector3.up * -2f;
+                base.transform.rotation = this.cm.transform.rotation;
+            }
+        }
+    }
 }

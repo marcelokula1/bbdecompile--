@@ -47,7 +47,6 @@ public class PickupAnimationScript : MonoBehaviour
 		{
 		}
 
-		transform.localPosition = Vector3.up *
-			                          (Mathf.Sin(Time.time * 2) * amplitude + centerY);
+		transform.localPosition = Vector3.up * (Mathf.Sin(Time.time * 2) * amplitude + centerY);
 	}
 }

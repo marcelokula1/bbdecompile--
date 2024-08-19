@@ -62,6 +62,7 @@ public class BaldiScript : MonoBehaviour
 				this.angerRate += this.angerRateRate; //Increase angerRate for next time
 			}
 		}
+
 	}
 
 	// Token: 0x060009A5 RID: 2469 RVA: 0x000246F8 File Offset: 0x00022AF8
@@ -272,6 +273,8 @@ else
 	private NavMeshAgent agent;
 
      public Animator Baldicator;
+     public GameControllerScript gc;
+     public bool done;
 
 
 }

@@ -26,22 +26,26 @@ public class NullScript : MonoBehaviour
 
     private void Start()
     {
-        TargetPlayer();
+		this.audioDevice = base.GetComponent<AudioSource>();
+        this.TargetPlayer();
     }
 
-    void Update()
+    private void Update()
     {
         if (this.coolDown > 0f)
+        {
+            this.coolDown -= 1f * Time.deltaTime;
+        }
+		else if (this.coolDown <= 0f)
 		{
-			this.coolDown -= 1f * Time.deltaTime;
+			this.TargetPlayer();
 		}
-        TargetPlayer();
     }
 
     private void FixedUpdate()
     {
         Vector3 direction = this.player.position - base.transform.position;
-		RaycastHit raycastHit;
+        RaycastHit raycastHit;
         if (Physics.Raycast(base.transform.position, direction, out raycastHit, float.PositiveInfinity, 3, QueryTriggerInteraction.Ignore) & raycastHit.transform.tag == "Player")
         {
             this.TargetPlayer();
@@ -51,7 +55,7 @@ public class NullScript : MonoBehaviour
     private void TargetPlayer()
     {
         agent.SetDestination(this.player.position);
-		this.coolDown = 1f;
+        this.coolDown = 1f;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -66,6 +70,7 @@ public class NullScript : MonoBehaviour
             this.agent.isStopped = true;
             base.StartCoroutine(AfterHit());
         }
+
     }
 
     private IEnumerator AfterHit()

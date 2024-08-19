@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.Events;
 
 
 public struct BaseItem 
@@ -42,6 +43,7 @@ public class GameControllerScript : MonoBehaviour
           {
            this.baldiTutor.SetActive(false); //Turns off Baldi(The one that you see at the start of the game)
            this.MusicPlayersAll.SetActive(false);
+           this.baldisource.volume = 0f; // Set the Baldi Audio Source volume to full
           } 
 	}
 
@@ -155,10 +157,15 @@ public class GameControllerScript : MonoBehaviour
 			this.notebookCount.text = this.notebooks.ToString() + "/" + this.maxNotebooks;
 			//this.notebookCount.text = "Notebooks Left: " + (this.maxNotebooks - this.notebooks).ToString();
 		}
-		else
+		else if (this.mode == "endless")
 		{
 			this.notebookCount.text = this.notebooks.ToString();
 			//this.notebookCount.text = "Notebooks Found: " + this.notebooks.ToString();
+		}
+		else if (this.mode == "NULL")
+		{
+			this.notebookCount.text = this.notebooks.ToString() + "/" + this.maxNotebooks;
+			//this.notebookCount.text = "Notebooks Left: " + (this.maxNotebooks - this.notebooks).ToString();
 		}
 		if (this.notebooks == this.maxNotebooks & this.mode == "story")
 		{
@@ -175,6 +182,12 @@ public class GameControllerScript : MonoBehaviour
 	{
 		this.notebooks++;
 		this.UpdateNotebookCount();
+         this.AnimateNotebook();
+	}
+
+	public void AnimateNotebook()
+	{
+     NotebookEvent.SetTrigger("PlayAnimation");
 	}
 
 	// Token: 0x06000968 RID: 2408 RVA: 0x0002203A File Offset: 0x0002043A
@@ -285,6 +298,10 @@ public void ActivateSpoopMode()
         {
             Debug.LogWarning("i forgot");
         }
+        if (this.mode == "NULL")
+         {
+          principal.SetActive(false);
+          }
     }
     else 
     {
@@ -698,6 +715,7 @@ public void ActivateSpoopMode()
     public void BossFightStart()
     {
         this.BossFight = true;
+        this.LockerController.SetActive(false);
         this.debugMode = true;
         this.player.runSpeed = this.player.walkSpeed;
         this.baldiScrpt.enabled = false;
@@ -716,6 +734,7 @@ public void ActivateSpoopMode()
         this.LoseItem(0);
         this.LoseItem(1);
         this.LoseItem(2);
+        this.baldisource.volume = 1f; // Set the Baldi Audio Source volume to full
     }
 public void PlayerIncrease(float setSpeed)
     {
@@ -739,7 +758,6 @@ public void NullHit()
 {
     this.health--;
 
-    // Check if health is at half
     if (this.health == healthAfterHit / 2 & FloorAndCeiling == true)
     {
         TransparentMaterial("Ceiling", transparent);
@@ -796,20 +814,16 @@ private IEnumerator AfterBossStart()
     }
 
 
-private void TransparentMaterial(string layerName, Material material)
+private void TransparentMaterial(string tagName, Material material)
 {
-    int targetLayer = LayerMask.NameToLayer(layerName);
-    GameObject[] allObjects = FindObjectsOfType<GameObject>();
+    GameObject[] taggedObjects = GameObject.FindGameObjectsWithTag(tagName);
 
-    foreach (GameObject obj in allObjects)
+    foreach (GameObject obj in taggedObjects)
     {
-        if (obj.layer == targetLayer)
+        Renderer objRenderer = obj.GetComponent<Renderer>();
+        if (objRenderer != null)
         {
-            Renderer objRenderer = obj.GetComponent<Renderer>();
-            if (objRenderer != null)
-            {
-                objRenderer.material = transparent;
-            }
+            objRenderer.material = material;
         }
     }
 }
@@ -985,6 +999,7 @@ private void TransparentMaterial(string layerName, Material material)
      public float TimeToMoveBaldi = 0f;
      public float BaldiAnger = 0f;
      public float BaldiSpeedScale = 0.65f;
+     public AudioSource baldisource;
 
     [Header("Principal Of the thing Settings")]
 
@@ -1131,4 +1146,10 @@ public BaseItem[] items;
      public Material transparent;
      public NullScript NullScript;
      public bool FloorAndCeiling;
+
+    [Header("Controllers")]  
+    public GameObject LockerController;
+    public GameObject WaterFountainsController;
+    public GameObject schoolHouseEscapeController;
+    public Animator NotebookEvent;
 }
