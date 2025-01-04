@@ -1,7 +1,22 @@
 fileFormatVersion: 2
 guid: c3a02fc0f8f169844a0dc5b54baac380
 TextureImporter:
-  internalIDToNameTable: []
+  internalIDToNameTable:
+  - first:
+      213: 6745533992891516564
+    second: JohnnyMouthSheet_0
+  - first:
+      213: -3535686762639157423
+    second: JohnnyMouthSheet_1
+  - first:
+      213: -1379779537449007244
+    second: JohnnyMouthSheet_2
+  - first:
+      213: 5662705942712579770
+    second: JohnnyMouthSheet_3
+  - first:
+      213: 2782438632448824596
+    second: JohnnyMouthSheet_4
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -41,7 +56,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -89,7 +104,112 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: JohnnyMouthSheet_0
+      rect:
+        serializedVersion: 2
+        x: 4
+        y: 75
+        width: 24
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4960f9a5d63fc9d50800000000000000
+      internalID: 6745533992891516564
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JohnnyMouthSheet_1
+      rect:
+        serializedVersion: 2
+        x: 37
+        y: 78
+        width: 22
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 15797db4f97beeec0800000000000000
+      internalID: -3535686762639157423
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JohnnyMouthSheet_2
+      rect:
+        serializedVersion: 2
+        x: 4
+        y: 49
+        width: 24
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 477cff132d90adce0800000000000000
+      internalID: -1379779537449007244
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JohnnyMouthSheet_3
+      rect:
+        serializedVersion: 2
+        x: 37
+        y: 47
+        width: 22
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ab670e67d09f59e40800000000000000
+      internalID: 5662705942712579770
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JohnnyMouthSheet_4
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 12
+        width: 13
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4159f68b1353d9620800000000000000
+      internalID: 2782438632448824596
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []

@@ -4,277 +4,298 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
 
-// Token: 0x020000D1 RID: 209
 public class PlayerScript : MonoBehaviour
 {
-	// Token: 0x060009D3 RID: 2515 RVA: 0x00025C74 File Offset: 0x00024074
-	private void Start()
-	{
-		//Yeah your on your own for this one
-		if (PlayerPrefs.GetInt("AnalogMove") == 1)
-		{
-			this.sensitivityActive = true;
-		}
-		this.height = base.transform.position.y;
-		this.stamina = this.maxStamina;
-		this.playerRotation = base.transform.rotation;
-		this.mouseSensitivity = PlayerPrefs.GetFloat("MouseSensitivity");
-		this.principalBugFixer = 1;
-		this.flipaturn = 1f;
-		this.m_Camera = Camera.main;
-        this.cameraScript = m_Camera.GetComponent<CameraScript>();
-	}
-
-	// Token: 0x060009D4 RID: 2516 RVA: 0x00025D04 File Offset: 0x00024104
-	private void Update()
-	{
-		base.transform.position = new Vector3(base.transform.position.x, this.height, base.transform.position.z);
-		this.MouseMove();
-		this.PlayerMove();
-		this.StaminaCheck();
-		this.GuiltCheck();
-		if (this.cc.velocity.magnitude > 0f)
-		{
-			this.gc.LockMouse();
-		}
-		if (this.jumpRope & ((base.transform.position - frozenPosition).magnitude >= 1f) && cameraScript.jumpHeight < 0.1f) // If the player moves, deactivate the jumprope minigame
-		{
-			this.DeactivateJumpRope();
-			this.playtime.Disappoint();
-		}
-		if (this.sweepingFailsave > 0f)
-		{
-			this.sweepingFailsave -= Time.deltaTime;
-		}
-		else
-		{
-			this.sweeping = false;
-			this.hugging = false;
-		}
-	}
-
-	// Token: 0x060009D5 RID: 2517 RVA: 0x00025E00 File Offset: 0x00024200
-	private void MouseMove()
-	{
-		this.playerRotation.eulerAngles = new Vector3(this.playerRotation.eulerAngles.x, this.playerRotation.eulerAngles.y, this.fliparoo);
-		this.playerRotation.eulerAngles = this.playerRotation.eulerAngles + Vector3.up * Input.GetAxis("Mouse X") * this.mouseSensitivity * Time.timeScale * this.flipaturn;
-		base.transform.rotation = this.playerRotation;
-	}
-
-	// Token: 0x060009D6 RID: 2518 RVA: 0x00025EAC File Offset: 0x000242AC
-	private void PlayerMove()
-	{
-		Vector3 vector = new Vector3(0f, 0f, 0f);
-		Vector3 vector2 = new Vector3(0f, 0f, 0f);
-		if (Singleton<InputManager>.Instance.GetActionKey(InputAction.MoveForward))
+    private void Start()
+    {
+        if (PlayerPrefs.GetInt("AnalogMove") == 1)
         {
-            vector = base.transform.forward * 1f;
+            this.sensitivityActive = true;
+        }
+        this.height = base.transform.position.y;
+        this.stamina = this.maxStamina;
+        this.playerRotation = base.transform.rotation;
+        this.mouseSensitivity = PlayerPrefs.GetFloat("MouseSensitivity");
+        this.principalBugFixer = 1;
+        this.flipaturn = 1f;
+        this.m_Camera = Camera.main;
+        this.cameraScript = m_Camera.GetComponent<CameraScript>();
+    }
+
+    private void Update()
+    {
+        base.transform.position = new Vector3(base.transform.position.x, this.height, base.transform.position.z);
+        this.MouseMove();
+        this.PlayerMove();
+        this.StaminaCheck();
+        this.GuiltCheck();
+        if (this.cc.velocity.magnitude > 0f)
+        {
+            this.gc.LockMouse();
+        }
+        if (this.jumpRope && (base.transform.position - frozenPosition).magnitude >= 1f && cameraScript.jumpHeight < 0.1f)
+        {
+            this.DeactivateJumpRope();
+            this.playtime.Disappoint();
+        }
+        if (this.sweepingFailsave > 0f)
+        {
+            this.sweepingFailsave -= Time.deltaTime;
+        }
+        else
+        {
+            this.sweeping = false;
+            this.hugging = false;
+        }
+    }
+
+    private void MouseMove()
+    {
+        this.playerRotation.eulerAngles = new Vector3(this.playerRotation.eulerAngles.x, this.playerRotation.eulerAngles.y, this.fliparoo);
+        this.playerRotation.eulerAngles += Vector3.up * Input.GetAxis("Mouse X") * this.mouseSensitivity * Time.timeScale * this.flipaturn;
+        base.transform.rotation = this.playerRotation;
+    }
+
+    private void PlayerMove()
+    {
+        Vector3 vector = Vector3.zero;
+        Vector3 vector2 = Vector3.zero;
+        if (Singleton<InputManager>.Instance.GetActionKey(InputAction.MoveForward))
+        {
+            vector = base.transform.forward;
         }
         if (Singleton<InputManager>.Instance.GetActionKey(InputAction.MoveBackward))
         {
-            vector = base.transform.forward * -1f;
+            vector = -base.transform.forward;
         }
         if (Singleton<InputManager>.Instance.GetActionKey(InputAction.MoveLeft))
         {
-            vector2 = base.transform.right * -1f;
+            vector2 = -base.transform.right;
         }
         if (Singleton<InputManager>.Instance.GetActionKey(InputAction.MoveRight))
         {
-            vector2 = base.transform.right * 1f;
+            vector2 = base.transform.right;
         }
-		if (this.stamina > 0f)
-		{
-			if (Singleton<InputManager>.Instance.GetActionKey(InputAction.Run))
-			{
-				this.playerSpeed = this.runSpeed;
-				this.sensitivity = 1f;
-				if (this.cc.velocity.magnitude > 0.1f & !this.hugging & !this.sweeping)
-				{
-					this.ResetGuilt("running", 0.1f);
-				}
-			}
-			else
-			{
-				this.playerSpeed = this.walkSpeed;
-				if (this.sensitivityActive)
-				{
-					this.sensitivity = Mathf.Clamp((vector2 + vector).magnitude, 0f, 1f);
-				}
-				else
-				{
-					this.sensitivity = 1f;
-				}
-			}
-		}
-		else
-		{
-			this.playerSpeed = this.walkSpeed;
-			if (this.sensitivityActive)
-			{
-				this.sensitivity = Mathf.Clamp((vector2 + vector).magnitude, 0f, 1f);
-			}
-			else
-			{
-				this.sensitivity = 1f;
-			}
-		}
-		this.playerSpeed *= Time.deltaTime;
-		this.moveDirection = (vector + vector2).normalized * this.playerSpeed * this.sensitivity;
-		if (!(!this.jumpRope & !this.sweeping & !this.hugging))
-		{
-			if (this.sweeping && !this.bootsActive)
-			{
-				this.moveDirection = this.gottaSweep.velocity * Time.deltaTime + this.moveDirection * 0.3f;
-			}
-			else if (this.hugging && !this.bootsActive)
-			{
-				this.moveDirection = (this.firstPrize.velocity * 1.2f * Time.deltaTime + (new Vector3(this.firstPrizeTransform.position.x, this.height, this.firstPrizeTransform.position.z) + new Vector3((float)Mathf.RoundToInt(this.firstPrizeTransform.forward.x), 0f, (float)Mathf.RoundToInt(this.firstPrizeTransform.forward.z)) * 3f - base.transform.position)) * (float)this.principalBugFixer;
-			}
-			else if (jumpRope)
+
+        if (this.stamina > 0f && Singleton<InputManager>.Instance.GetActionKey(InputAction.Run))
+        {
+            this.playerSpeed = this.runSpeed;
+            this.sensitivity = 1f;
+            if (this.cc.velocity.magnitude > 0.1f && !this.hugging && !this.sweeping)
             {
-                if (cameraScript.jumpHeight > 0.1f)
-                    moveDirection *= jumpRopeSpeedMultiplier;
-                else
-                    moveDirection = Vector3.zero;
+                this.ResetGuilt("running", 0.1f);
             }
-		}
-		this.cc.Move(this.moveDirection);
-		if ((!sweeping || bootsActive) && (!hugging || bootsActive) && jumpRope && cameraScript.jumpHeight > 0.1f) frozenPosition = transform.position;
-	}
+        }
+        else
+        {
+            this.playerSpeed = this.walkSpeed;
+            this.sensitivity = this.sensitivityActive ? Mathf.Clamp((vector2 + vector).magnitude, 0f, 1f) : 1f;
+        }
 
-	// Token: 0x060009D7 RID: 2519 RVA: 0x00026210 File Offset: 0x00024610
-	private void StaminaCheck()
-	{
-		if (this.cc.velocity.magnitude > 0.1f)
-		{
-			if (Singleton<InputManager>.Instance.GetActionKey(InputAction.Run) & this.stamina > 0f)
-			{
-				this.stamina -= this.staminaRate * Time.deltaTime;
-			}
-			if (this.stamina < 0f & this.stamina > -5f)
-			{
-				this.stamina = -5f;
-			}
-		}
-		else if (this.stamina < this.maxStamina)
-		{
-			this.stamina += this.staminaRate * Time.deltaTime;
-		}
-		this.staminaBar.value = this.stamina / this.maxStamina * 100f;
-	}
+        this.playerSpeed *= Time.deltaTime;
+        this.moveDirection = (vector + vector2).normalized * this.playerSpeed * this.sensitivity;
 
-	// Token: 0x060009D8 RID: 2520 RVA: 0x000262F0 File Offset: 0x000246F0
-	private void OnTriggerEnter(Collider other)
-	{
-		if (other.transform.name == "Baldi" & !this.gc.debugMode)
-		{
-			this.gameOver = true;
-			RenderSettings.skybox = this.blackSky; //Sets the skybox black
-			base.StartCoroutine(this.KeepTheHudOff()); //Hides the Hud
-		}
-		else if (other.transform.name == "Playtime" & !this.jumpRope & this.playtime.playCool <= 0f)
-		{
-			this.ActivateJumpRope();
-		}
-	}
+        if (this.sweeping && !this.bootsActive)
+        {
+            this.moveDirection += this.gottaSweep.velocity * Time.deltaTime * 0.3f;
+        }
+        else if (this.hugging && !this.bootsActive)
+        {
+            this.moveDirection = (this.firstPrize.velocity * 1.2f * Time.deltaTime + (new Vector3(this.firstPrizeTransform.position.x, this.height, this.firstPrizeTransform.position.z) + new Vector3((float)Mathf.RoundToInt(this.firstPrizeTransform.forward.x), 0f, (float)Mathf.RoundToInt(this.firstPrizeTransform.forward.z)) * 3f - base.transform.position)) * this.principalBugFixer;
+        }
+        else if (jumpRope && cameraScript.jumpHeight > 0.1f)
+        {
+            this.moveDirection *= jumpRopeSpeedMultiplier;
+        }
 
-	// Token: 0x060009D9 RID: 2521 RVA: 0x0002638C File Offset: 0x0002478C
-	public IEnumerator KeepTheHudOff()
-	{
-		while (this.gameOver)
-		{
-			this.hud.enabled = false;
-			this.jumpRopeScreen.SetActive(false);
-			yield return new WaitForEndOfFrame();
-		}
-		yield break;
-	}
+        this.cc.Move(this.moveDirection);
 
-	// Token: 0x060009DA RID: 2522 RVA: 0x000263A8 File Offset: 0x000247A8
-	private void OnTriggerStay(Collider other)
-	{
-		if (other.transform.name == "Gotta Sweep")
-		{
-			this.sweeping = true;
-			this.sweepingFailsave = 1f;
-		}
-		else if (other.transform.name == "1st Prize" & this.firstPrize.velocity.magnitude > 5f)
-		{
-			this.hugging = true;
-			this.sweepingFailsave = 1f;
-		}
-	}
+        if ((!sweeping || bootsActive) && (!hugging || bootsActive) && jumpRope && cameraScript.jumpHeight > 0.1f)
+        {
+            frozenPosition = transform.position;
+        }
+    }
 
-	// Token: 0x060009DB RID: 2523 RVA: 0x00026430 File Offset: 0x00024830
-	private void OnTriggerExit(Collider other)
-	{
-		if (other.transform.name == "Office Trigger")
-		{
-			this.ResetGuilt("escape", this.door.lockTime);
-		}
-		else if (other.transform.name == "Gotta Sweep")
-		{
-			this.sweeping = false;
-		}
-		else if (other.transform.name == "1st Prize")
-		{
-			this.hugging = false;
-		}
-	}
+    private void StaminaCheck()
+    {
+        if (this.cc.velocity.magnitude > 0.1f)
+        {
+            if (Singleton<InputManager>.Instance.GetActionKey(InputAction.Run) && this.stamina > 0f)
+            {
+                this.stamina -= this.staminaRate * Time.deltaTime;
+            }
+            if (this.stamina < 0f && this.stamina > -5f)
+            {
+                this.stamina = -5f;
+            }
+        }
+        else if (this.stamina < this.maxStamina)
+        {
+            this.stamina += this.staminaRate * Time.deltaTime;
+        }
+        this.staminaBar.value = this.stamina / this.maxStamina * 100f;
+    }
 
-	// Token: 0x060009DC RID: 2524 RVA: 0x000264B9 File Offset: 0x000248B9
-	public void ResetGuilt(string type, float amount)
-	{
-		if (amount >= this.guilt)
-		{
-			this.guilt = amount;
-			this.guiltType = type;
-		}
-	}
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.transform.name == "Baldi" && !this.gc.debugMode)
+        {
+            this.gameOver = true;
+            RenderSettings.skybox = this.blackSky;
+            StartCoroutine(this.KeepTheHudOff());
+        }
+        else if (other.transform.name == "Playtime" && !this.jumpRope && this.playtime.playCool <= 0f)
+        {
+            this.ActivateJumpRope();
+        }
+        if (this.gc.item[0] != 15 && this.gc.item[1] != 15 && this.gc.item[2] != 15)
+        {
+            if (other.transform.name == "Baldi" && !this.gc.debugMode && !this.baldi.AppleEating)
+            {
+                this.gameOver = true;
+            }
+        }
+        else if (other.transform.name == "Baldi" && !this.baldi.AppleEating)
+        {
+            this.Apple();
+            this.AppleLose = false;
+        }
+    }
 
-	// Token: 0x060009DD RID: 2525 RVA: 0x000264D5 File Offset: 0x000248D5
-	private void GuiltCheck()
-	{
-		if (this.guilt > 0f)
-		{
-			this.guilt -= Time.deltaTime;
-		}
-	}
+    private IEnumerator KeepTheHudOff()
+    {
+        while (this.gameOver)
+        {
+            this.hud.enabled = false;
+            this.jumpRopeScreen.SetActive(false);
+            yield return new WaitForEndOfFrame();
+        }
+    }
 
-	// Token: 0x060009DE RID: 2526 RVA: 0x000264F9 File Offset: 0x000248F9
-	public void ActivateJumpRope()
-	{
-		this.jumpRopeScreen.SetActive(true);
-		this.jumpRope = true;
-		this.frozenPosition = base.transform.position;
-	}
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.transform.name == "Gotta Sweep")
+        {
+            this.sweeping = true;
+            this.sweepingFailsave = 1f;
+        }
+        else if (other.transform.name == "1st Prize" && this.firstPrize.velocity.magnitude > 5f)
+        {
+            this.hugging = true;
+            this.sweepingFailsave = 1f;
+        }
+        if (other.name == "Gum" && other.GetComponentInChildren<SpriteRenderer>().sprite != BeansScript.spriteNPCGum)
+        {
+            StartCoroutine(Stucked());
+            Destroy(other.gameObject);
+            FindObjectOfType<BeansScript>().SorryPlayer();
+        }
+        if (this.gc.item[0] != 15 && this.gc.item[1] != 15 && this.gc.item[2] != 15)
+        {
+            if (other.transform.name == "Baldi" && !this.gc.debugMode && !this.baldi.AppleEating && !this.gameOver)
+            {
+                this.gameOver = true;
+                RenderSettings.skybox = this.blackSky;
+                StartCoroutine(this.KeepTheHudOff());
+            }
+        }
+        else if (other.transform.name == "Baldi" && !this.baldi.AppleEating)
+        {
+            this.Apple();
+            this.AppleLose = false;
+        }
+    }
 
-	// Token: 0x060009DF RID: 2527 RVA: 0x0002651F File Offset: 0x0002491F
-	public void DeactivateJumpRope()
-	{
-		this.jumpRopeScreen.SetActive(false);
-		this.jumpRope = false;
-	}
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.transform.name == "Office Trigger")
+        {
+            this.ResetGuilt("escape", this.door.lockTime);
+        }
+        else if (other.transform.name == "Gotta Sweep")
+        {
+            this.sweeping = false;
+        }
+        else if (other.transform.name == "1st Prize")
+        {
+            this.hugging = false;
+        }
+    }
 
-	// Token: 0x060009E0 RID: 2528 RVA: 0x00026534 File Offset: 0x00024934
-	public void ActivateBoots()
-	{
-		this.bootsActive = true;
-		base.StartCoroutine(this.BootTimer());
-	}
+    public void ResetGuilt(string type, float amount)
+    {
+        if (amount >= this.guilt)
+        {
+            this.guilt = amount;
+            this.guiltType = type;
+        }
+    }
 
-	// Token: 0x060009E1 RID: 2529 RVA: 0x0002654C File Offset: 0x0002494C
-	private IEnumerator BootTimer()
-	{
-		float time = 60f;
-		while (time > 0f)
-		{
-			time -= Time.deltaTime;
-			yield return null;
-		}
-		this.bootsActive = false;
-		yield break;
-	}
+    private void GuiltCheck()
+    {
+        if (this.guilt > 0f)
+        {
+            this.guilt -= Time.deltaTime;
+        }
+    }
+
+    public void ActivateJumpRope()
+    {
+        this.jumpRopeScreen.SetActive(true);
+        this.jumpRope = true;
+        this.frozenPosition = base.transform.position;
+    }
+
+    public void DeactivateJumpRope()
+    {
+        this.jumpRopeScreen.SetActive(false);
+        this.jumpRope = false;
+    }
+
+    public void ActivateBoots()
+    {
+        this.bootsActive = true;
+        StartCoroutine(this.BootTimer());
+    }
+
+    private IEnumerator BootTimer()
+    {
+        float time = 60f;
+        while (time > 0f)
+        {
+            time -= Time.deltaTime;
+            yield return null;
+        }
+        this.bootsActive = false;
+    }
+
+    private IEnumerator Stucked()
+    {
+        gumScreen.SetActive(true);
+        walkSpeed -= 8f;
+        runSpeed -= 8f;
+        playerSpeed = walkSpeed;
+        yield return new WaitForSeconds(10f);
+        walkSpeed += 8f;
+        runSpeed += 8f;
+        playerSpeed = walkSpeed;
+        gumScreen.SetActive(false);
+    }
+
+    public void Apple()
+    {
+        this.baldi.Apple();
+        for (int i = 0; i < 5; i++)
+        {
+            if (this.gc.item[i] == 15 && !this.AppleLose)
+            {
+                this.gc.LoseItem(i);
+                this.AppleLose = true;
+                break;
+            }
+        }
+    }
+
 
 	// Token: 0x040006E9 RID: 1769
 	public GameControllerScript gc;
@@ -401,6 +422,8 @@ public class PlayerScript : MonoBehaviour
 
 	// Token: 0x04000717 RID: 1815
     private CameraScript cameraScript;
-
+    public bool AppleLose;
     public bool holdingObject;
+    public bool grapping;
+    public GameObject gumScreen;
 }

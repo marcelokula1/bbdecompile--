@@ -19,6 +19,7 @@ TagManager:
   - BlueLocker
   - Floor
   - Ceiling
+  - GrapplingHook
   layers:
   - Default
   - TransparentFX
@@ -27,7 +28,7 @@ TagManager:
   - Water
   - UI
   - Ceiling
-  - 
+  - Student
   - 
   - 
   - 

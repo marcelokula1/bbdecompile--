@@ -1,10 +1,9 @@
-﻿using System;
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using UnityEngine.Events;
 
 
 public struct BaseItem 
@@ -38,6 +37,7 @@ public class GameControllerScript : MonoBehaviour
           if (IsStudentHere == true)
           {
           Student.SetActive(true);
+		  Studentcam.gameObject.SetActive(true);
           }
           if (this.mode == "NULL")
           {
@@ -180,8 +180,13 @@ public class GameControllerScript : MonoBehaviour
 	// Token: 0x06000967 RID: 2407 RVA: 0x00022024 File Offset: 0x00020424
 	public void CollectNotebook()
 	{
-		this.notebooks++;
-		this.UpdateNotebookCount();
+         this.notebooks++;
+         this.UpdateNotebookCount();
+         YTPsAnim.Play("YTPs", -1);
+         YTPsAnimAdd.Play("YTPsAdd", -1);
+         this.YTPsFA = UnityEngine.Random.Range(5, 15);
+         this.YTPs += YTPsFA;
+         this.audioDevice.PlayOneShot(YTPsSound, 1);
          this.AnimateNotebook();
 	}
 
@@ -268,8 +273,10 @@ public void ActivateSpoopMode()
         this.baldiScrpt.timeToMove = TimeToMoveBaldi;
         this.baldiScrpt.baldiAnger = BaldiAnger;
         this.baldiScrpt.baldiSpeedScale = BaldiSpeedScale;
+		this.NullScript.enabled = false;
         if (this.mode == "NULL")
         {
+	      NullScript.enabled = true;
           NullSprite.SetActive(true);
           BaldiSprite.SetActive(false);
           this.quarter.SetActive(false);
@@ -400,6 +407,9 @@ public void ActivateSpoopMode()
 			this.audioDevice.PlayOneShot(this.aud_AllNotebooks, 0.8f);
 		}
 	}
+
+
+
 
 	// Token: 0x06000972 RID: 2418 RVA: 0x00022360 File Offset: 0x00020760
 	private void ChangeItemSelection(int change)
@@ -593,6 +603,34 @@ public void ActivateSpoopMode()
 				base.StartCoroutine(this.BootAnimation());
 				this.ResetItem();
 			}
+              else if (this.item[this.itemSelected] == 11)
+			{
+				GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(this.grappingHook, player.transform.position + PlayerCamera.transform.forward * 3.5f, this.cameraTransform.rotation);
+				gameObject.GetComponent<GrappingHookScript>().ps = player;
+				gameObject.GetComponent<GrappingHookScript>().cc = player.GetComponent<CharacterController>();
+				ResetItem();
+			}
+              else if (this.item[this.itemSelected] == 12)
+            {
+                this.audioDevice.PlayOneShot(this.aud_Whistle);
+                this.principalAudio.PlayOneShot(this.aud_Coming);
+                this.principalScript.Summoned();
+                this.ResetItem();
+            }
+            	else if (this.item[this.itemSelected] == 13)
+			{
+				base.StartCoroutine(this.Teleporter());
+				this.ResetItem();
+			}
+			   else if (this.item[this.itemSelected] == 15)
+			{
+			  YTPsAnim.Play("YTPs", -1);
+               YTPsAnimAdd.Play("YTPsAdd", -1);
+                this.YTPsFA = UnityEngine.Random.Range(15, 16);
+                this.YTPs += YTPsFA;
+                this.audioDevice.PlayOneShot(YTPsSound, 1);
+				this.ResetItem();
+			}
 		}
 	}
 
@@ -636,6 +674,48 @@ public void ActivateSpoopMode()
 		this.boots.gameObject.SetActive(false);
 		yield break;
 	}
+    private IEnumerator Teleporter()
+	{
+		this.playerCharacter.enabled = false;
+		this.playerCollider.enabled = false;
+		int teleports = UnityEngine.Random.Range(12, 16);
+		int teleportCount = 0;
+		float baseTime = 0.2f;
+		float currentTime = baseTime;
+		float increaseFactor = 1.1f;
+		while (teleportCount < teleports)
+		{
+			currentTime -= Time.deltaTime;
+			if (currentTime < 0f)
+			{
+				this.Teleport();
+				teleportCount++;
+				baseTime *= increaseFactor;
+				currentTime = baseTime;
+			}
+			if (this.flipped)
+			{
+				this.player.height = 6f;
+			}
+			else
+			{
+				this.player.height = 4f;
+			}
+			yield return null;
+		}
+		this.playerCharacter.enabled = true;
+		this.playerCollider.enabled = true;
+		yield break;
+	}
+ 
+	// Token: 0x06000992 RID: 2450 RVA: 0x000236BC File Offset: 0x00021ABC
+	private void Teleport()
+	{
+		this.AILocationSelector.GetNewTarget();
+		this.player.transform.position = this.AILocationSelector.transform.position + Vector3.up * this.player.height;
+		this.audioDevice.PlayOneShot(this.aud_Teleport);
+	}
+
 
 	// Token: 0x06000978 RID: 2424 RVA: 0x00022B5B File Offset: 0x00020F5B
 	private void ResetItem()
@@ -896,12 +976,6 @@ private void TransparentMaterial(string tagName, Material material)
 	// Token: 0x0400061A RID: 1562
 	public int exitsReached;
 
-	// Token: 0x04000622 RID: 1570
-	public GameObject bsodaSpray;
-
-	// Token: 0x04000623 RID: 1571
-	public GameObject alarmClock;
-
 	// Token: 0x04000624 RID: 1572
 	public TMP_Text notebookCount;
 
@@ -1008,6 +1082,26 @@ private void TransparentMaterial(string tagName, Material material)
     
     [Header("Item Stuff")]          // item 
 
+    public PrincipalScript principalScript;
+
+
+public AudioSource principalAudio;
+
+
+public AudioClip aud_Coming;
+
+
+public AudioClip aud_Whistle;
+
+
+	// Token: 0x04000622 RID: 1570
+	public GameObject bsodaSpray;
+
+	// Token: 0x04000623 RID: 1571
+	public GameObject alarmClock;
+
+     public GameObject grappingHook;
+
 	public string[] itemNames = new string[]
 	{
 		"Nothing",
@@ -1043,6 +1137,21 @@ private void TransparentMaterial(string tagName, Material material)
 
 	// Token: 0x04000621 RID: 1569
 	public Texture[] itemTextures = new Texture[10];
+
+    	// Token: 0x04000623 RID: 1594
+	public CharacterController playerCharacter;
+ 
+	// Token: 0x04000624 RID: 1595
+	public Collider playerCollider;
+ 
+	// Token: 0x04000625 RID: 1596
+	public AILocationSelectorScript AILocationSelector;
+ 
+	// Token: 0x04000634 RID: 1597
+	public AudioClip aud_Teleport;
+ 
+	// Token: 0x04000635 RID: 1598
+	private bool flipped;
 
     [Header("Audio Stuff")]                // audio
 
@@ -1105,6 +1214,7 @@ public BaseItem[] items;
 
     public bool IsStudentHere;
     public GameObject Student;
+	public RawImage Studentcam;
 
     public bool ElevatorExits;
     
@@ -1115,6 +1225,16 @@ public BaseItem[] items;
     public AudioClip SchoolhouseEscapeMusic;
     public Color color;
     AudioSource audioSource; 
+
+    public float YTPs;
+
+public float YTPsFA;
+
+public Animator YTPsAnim;
+
+public Animator YTPsAnimAdd;
+
+public AudioClip YTPsSound;
     
     [Header("NULL Settings")]  
      public GameObject MusicPlayersAll;
@@ -1146,6 +1266,7 @@ public BaseItem[] items;
      public Material transparent;
      public NullScript NullScript;
      public bool FloorAndCeiling;
+
 
     [Header("Controllers")]  
     public GameObject LockerController;

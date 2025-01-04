@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Events;
 
 public class NullScript : MonoBehaviour
 {
@@ -23,6 +24,8 @@ public class NullScript : MonoBehaviour
     public SpriteRenderer sr;
 
     public GameControllerScript gc;
+
+    public UnityEvent ShakeScreenEvent;
 
     private void Start()
     {

@@ -170,6 +170,22 @@ public class PrincipalScript : MonoBehaviour
 			this.bullySeen = false;
 		}
 	}
+     
+     public void Summoned()
+    {
+        this.agent.speed = 30f;
+        this.TargetPlayer();
+        this.summon = true;
+    }
+
+        private void OnTriggerEnter(Collider other)
+    {
+        if (other.name == "Player" & this.summon)
+        {
+            this.summon = false;
+            this.agent.speed = 30f;
+        }
+    }
 
 	// Token: 0x040006B8 RID: 1720
 	public bool seesRuleBreak;
@@ -281,4 +297,6 @@ public class PrincipalScript : MonoBehaviour
 	private Vector3 aim;
 
 	public CharacterController cc;
+
+     public bool summon;
 }

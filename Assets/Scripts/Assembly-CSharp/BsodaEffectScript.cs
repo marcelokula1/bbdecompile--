@@ -43,6 +43,22 @@ public class BsodaEffectScript : MonoBehaviour
 			this.otherVelocity = base.transform.forward * this.agent.speed * 0.1f + other.GetComponent<NavMeshAgent>().velocity;
 			this.failSave = 1f;
 		}
+          if (other.name == "Gum" & gameObject.name != "Beans")
+{
+    if (other.transform.position.y <= 0f)
+    {
+       other.transform.position = new Vector3(transform.position.x, 0f, transform.position.z);
+       return;
+    }
+    other.GetComponentInChildren<SpriteRenderer>().sprite = BeansScript.spriteNPCGum;
+    other.GetComponent<BsodaSparyScript>().speed = 0f;
+    UnityEngine.Object.FindObjectOfType<BeansScript>().SorryNPC();
+    other.transform.position = new Vector3(transform.position.x, 0f, transform.position.z);
+    otherVelocity = base.transform.forward * agent.speed * 0.05f;
+    UnityEngine.Object.Destroy(other.gameObject, 10f);
+    inBsoda = true;
+    failSave = 10f;
+}
 	}
 
 	// Token: 0x06000012 RID: 18 RVA: 0x0000236D File Offset: 0x0000076D

@@ -5,185 +5,195 @@ using UnityEngine.AI;
 // Token: 0x020000C9 RID: 201
 public class BaldiScript : MonoBehaviour
 {
-	// Token: 0x060009A3 RID: 2467 RVA: 0x00024564 File Offset: 0x00022964
-	private void Start()
-	{
-		this.baldiAudio = base.GetComponent<AudioSource>(); //Get The Baldi Audio Source(Used mostly for the slap sound)
-		this.agent = base.GetComponent<NavMeshAgent>(); //Get the Nav Mesh Agent
-		this.timeToMove = this.baseTime; //Sets timeToMove to baseTime
-		this.Wander(); //Start wandering
-		if (PlayerPrefs.GetInt("Rumble") == 1)
-		{
-			this.rumble = true;
-		}
-	}
+    private void Start()
+    {
+        this.baldiAudio = GetComponent<AudioSource>();
+        this.agent = GetComponent<NavMeshAgent>();
+        this.timeToMove = this.baseTime;
+        this.Wander();
 
-	// Token: 0x060009A4 RID: 2468 RVA: 0x000245C4 File Offset: 0x000229C4
-	private void Update()
-	{
-		if (this.timeToMove > 0f) //If timeToMove is greater then 0, decrease it
-		{
-			this.timeToMove -= 1f * Time.deltaTime;
-		}
-		else
-		{
-			this.Move(); //Start moving
-		}
-		if (this.coolDown > 0f) //If coolDown is greater then 0, decrease it
-		{
-			this.coolDown -= 1f * Time.deltaTime;
-		}
-		if (this.baldiTempAnger > 0f) //Slowly decrease Baldi's temporary anger over time.
-		{
-			this.baldiTempAnger -= 0.02f * Time.deltaTime;
-		}
-		else
-		{
-			this.baldiTempAnger = 0f; //Cap its lowest value at 0
-		}
-		if (this.antiHearingTime > 0f) //Decrease antiHearingTime, then when it runs out stop the effects of the antiHearing tape
-		{
-			this.antiHearingTime -= Time.deltaTime;
-		}
-		else
-		{
-			this.antiHearing = false;
-		}
-		if (this.endless) //Only activate if the player is playing on endless mode
-		{
-			if (this.timeToAnger > 0f) //Decrease the timeToAnger
-			{
-				this.timeToAnger -= 1f * Time.deltaTime;
-			}
-			else
-			{
-				this.timeToAnger = this.angerFrequency; //Set timeToAnger to angerFrequency
-				this.GetAngry(this.angerRate); //Get angry based on angerRate
-				this.angerRate += this.angerRateRate; //Increase angerRate for next time
-			}
-		}
+        if (PlayerPrefs.GetInt("Rumble") == 1)
+        {
+            this.rumble = true;
+        }
+    }
 
-	}
+    private void Update()
+    {
+        if (this.timeToMove > 0f)
+        {
+            this.timeToMove -= Time.deltaTime;
+        }
+        else
+        {
+            this.Move();
+        }
 
-	// Token: 0x060009A5 RID: 2469 RVA: 0x000246F8 File Offset: 0x00022AF8
-	private void FixedUpdate()
-	{
-		if (this.moveFrames > 0f) //Move for a certain amount of frames, and then stop moving.(Ruler slapping)
-		{
-			this.moveFrames -= 1f;
-			this.agent.speed = this.speed;
-		}
-		else
-		{
-			this.agent.speed = 0f;
-		}
-		Vector3 direction = this.player.position - base.transform.position; 
-		RaycastHit raycastHit;
-		if (Physics.Raycast(base.transform.position + Vector3.up * 2f, direction, out raycastHit, float.PositiveInfinity, 769, QueryTriggerInteraction.Ignore) & raycastHit.transform.tag == "Player") //Create a raycast, if the raycast hits the player, Baldi can see the player
-		{
-			this.db = true;
-			this.TargetPlayer(); //Start attacking the player
-		}
-		else
-		{
-			this.db = false;
-		}
-	}
+        if (this.coolDown > 0f)
+        {
+            this.coolDown -= Time.deltaTime;
+        }
 
-	// Token: 0x060009A6 RID: 2470 RVA: 0x000247D0 File Offset: 0x00022BD0
-	private void Wander()
-	{
-		this.wanderer.GetNewTarget(); //Get a new location
-		this.agent.SetDestination(this.wanderTarget.position); //Head towards the position of the wanderTarget object
-		this.coolDown = 1f; //Set the cooldown
-		this.currentPriority = 0f;
-	}
+        if (this.baldiTempAnger > 0f)
+        {
+            this.baldiTempAnger -= 0.02f * Time.deltaTime;
+        }
+        else
+        {
+            this.baldiTempAnger = 0f;
+        }
 
-	// Token: 0x060009A7 RID: 2471 RVA: 0x0002480A File Offset: 0x00022C0A
-	public void TargetPlayer()
-	{
-		this.agent.SetDestination(this.player.position); //Target the player
-		this.coolDown = 1f;
-		this.currentPriority = 0f;
-	}
+        if (this.antiHearingTime > 0f)
+        {
+            this.antiHearingTime -= Time.deltaTime;
+        }
+        else
+        {
+            this.antiHearing = false;
+        }
 
-	// Token: 0x060009A8 RID: 2472 RVA: 0x0002483C File Offset: 0x00022C3C
-	private void Move()
-	{
-		if (base.transform.position == this.previous & this.coolDown < 0f) // If Baldi reached his destination, start wandering
-		{
-			this.Wander();
-		}
-		this.moveFrames = 10f;
-		this.timeToMove = this.baldiWait - this.baldiTempAnger;
-		this.previous = base.transform.position; // Set previous to Baldi's current location
-		this.baldiAudio.PlayOneShot(this.slap); //Play the slap sound
-		this.baldiAnimator.SetTrigger("slap"); // Play the slap animation
-		if (this.rumble)
-		{
-			float num = Vector3.Distance(base.transform.position, this.player.position);
-			if (num < this.vibrationDistance)
-			{
-				float motorLevel = 1f - num / this.vibrationDistance;
-			}
-		}
-	}
+        if (this.endless)
+        {
+            if (this.timeToAnger > 0f)
+            {
+                this.timeToAnger -= Time.deltaTime;
+            }
+            else
+            {
+                this.timeToAnger = this.angerFrequency;
+                this.GetAngry(this.angerRate);
+                this.angerRate += this.angerRateRate;
+            }
+        }
 
-	// Token: 0x060009A9 RID: 2473 RVA: 0x00024930 File Offset: 0x00022D30
-	public void GetAngry(float value)
-	{
-		this.baldiAnger += value; // Increase Baldi's anger by the value provided
-		if (this.baldiAnger < 0.5f) //Cap Baldi anger at a minimum of 0.5
-		{
-			this.baldiAnger = 0.5f;
-		}
-		this.baldiWait = -3f * this.baldiAnger / (this.baldiAnger + 2f / this.baldiSpeedScale) + 3f; //Some formula I don't understand.
-	}
+        if (this.EatingSoundDelay > 0f && this.AppleEating && this.startedEating && this.gc.mode == "Story")
+        {
+            this.EatingSoundDelay -= Time.deltaTime;
+        }
 
-	// Token: 0x060009AA RID: 2474 RVA: 0x00024992 File Offset: 0x00022D92
-	public void GetTempAngry(float value)
-	{
-		this.baldiTempAnger += value; //Increase Baldi's Temporary Anger
-	}
+        if (this.EatingSoundDelay <= 0f && this.AppleEating)
+        {
+            int num = Mathf.RoundToInt(UnityEngine.Random.Range(0f, 1f));
+            this.baldiAudio2.PlayOneShot(this.BAL_Crunch[num]);
+            this.times = Mathf.Round(UnityEngine.Random.Range(0f, 50f));
+            if (this.times <= 2f)
+            {
+                this.baldiAudio2.PlayOneShot(this.BAL_Yum);
+            }
+            this.EatingSoundDelay = 0.05f;
+        }
+    }
 
-public void Hear(Vector3 soundLocation, float priority)
+    private void FixedUpdate()
+    {
+        if (this.moveFrames > 0f)
+        {
+            this.moveFrames -= 1f;
+            this.agent.speed = this.speed;
+        }
+        else
+        {
+            this.agent.speed = 0f;
+        }
 
-{
+        Vector3 direction = this.player.position - transform.position;
+        if (Physics.Raycast(transform.position + Vector3.up * 2f, direction, out RaycastHit hit, float.PositiveInfinity, 769, QueryTriggerInteraction.Ignore) && hit.transform.CompareTag("Player"))
+        {
+            this.db = true;
+            this.TargetPlayer();
+        }
+        else
+        {
+            this.db = false;
+        }
+    }
 
-if (!this.antiHearing && priority >= this.currentPriority )//If anti-hearing is not active and the priority is greater then the priority of the current sound
+    private void Wander()
+    {
+        this.wanderer.GetNewTarget();
+        this.agent.SetDestination(this.wanderTarget.position);
+        this.coolDown = 1f;
+        this.currentPriority = 0f;
+    }
 
-{
+    public void TargetPlayer()
+    {
+        this.agent.SetDestination(this.player.position);
+        this.coolDown = 1f;
+        this.currentPriority = 0f;
+    }
 
-             
+    private void Move()
+    {
+        if (transform.position == this.previous && this.coolDown < 0f)
+        {
+            this.Wander();
+        }
+        this.moveFrames = 10f;
+        this.timeToMove = this.baldiWait - this.baldiTempAnger;
+        this.previous = transform.position;
+        this.baldiAudio.PlayOneShot(this.slap);
+        this.baldiAnimator.SetTrigger("slap");
+        if (this.rumble)
+        {
+            float distance = Vector3.Distance(transform.position, this.player.position);
+            if (distance < this.vibrationDistance)
+            {
+                float motorLevel = 1f - distance / this.vibrationDistance;
+            }
+        }
+        this.timeToMove = this.baldiWait - this.baldiTempAnger;
+        this.AppleEating = false;
+        this.startedEating = false;
+        this.baldiAnimator.SetBool("EatingApple", false);
+        this.previous = transform.position;
+    }
 
-this.agent.SetDestination(soundLocation);//Go to that sound
+    public void GetAngry(float value)
+    {
+        this.baldiAnger += value;
+        if (this.baldiAnger < 0.5f)
+        {
+            this.baldiAnger = 0.5f;
+        }
+        this.baldiWait = -3f * this.baldiAnger / (this.baldiAnger + 2f / this.baldiSpeedScale) + 3f;
+    }
 
-this.currentPriority = priority;//Set the current priority to the priority
+    public void GetTempAngry(float value)
+    {
+        this.baldiTempAnger += value;
+    }
 
-                this.Baldicator.Play("Baldicator_Look", -1, 0f);
+    public void Hear(Vector3 soundLocation, float priority)
+    {
+        if (!this.antiHearing && priority >= this.currentPriority)
+        {
+            this.agent.SetDestination(soundLocation);
+            this.currentPriority = priority;
+            this.Baldicator.Play("Baldicator_Look", -1, 0f);
+        }
+        else
+        {
+            this.Baldicator.Play("Baldicator_Think", -1, 0f);
+        }
+    }
 
-                
+    public void ActivateAntiHearing(float t)
+    {
+        this.Wander();
+        this.antiHearing = true;
+        this.antiHearingTime = t;
+    }
 
-               
-}
+    public void Apple()
+    {
+        this.baldiAnimator.SetTrigger("Apple");
+        this.timeToMove = Mathf.RoundToInt(UnityEngine.Random.Range(13, 18));
+        this.baldiAudio.PlayOneShot(this.BAL_Apple);
+        this.AppleEating = true;
+        this.EatingSoundDelay = 0.01f;
+    }
 
-else
-
-{
-
-             this.Baldicator.Play("Baldicator_Think", -1, 0f);
-
-}
-
-}
-
-	// Token: 0x060009AC RID: 2476 RVA: 0x000249CF File Offset: 0x00022DCF
-	public void ActivateAntiHearing(float t)
-	{
-		this.Wander(); //Start wandering
-		this.antiHearing = true; //Set the antihearing variable to true for other scripts
-		this.antiHearingTime = t; //Set the time the tape's effect on baldi will last
-	}
 
 	// Token: 0x0400067F RID: 1663
 	public bool db;
@@ -275,6 +285,22 @@ else
      public Animator Baldicator;
      public GameControllerScript gc;
      public bool done;
+
+    public bool AppleEating;    
+    
+    public bool startedEating;
+
+    public float times;
+
+    public float EatingSoundDelay;
+
+    public AudioSource baldiAudio2;
+
+    public AudioClip BAL_Apple;
+
+    public AudioClip BAL_Yum;
+
+    public AudioClip[] BAL_Crunch = new AudioClip[2];
 
 
 }
