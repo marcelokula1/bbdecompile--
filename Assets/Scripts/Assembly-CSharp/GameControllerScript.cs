@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 
 public struct BaseItem 
@@ -833,6 +834,10 @@ private void BossFightBegin()
         this.bossFightMusic.Play();
         this.player.walkSpeed = 19f;
         this.player.runSpeed = 19f;
+		if (ShakingWalls == true)
+		{
+        ShakeWall.SetActive(true);
+		}
     }
 public void NullHit()
 {
@@ -908,6 +913,18 @@ private void TransparentMaterial(string tagName, Material material)
     }
 }
 
+    public void Nextlap()
+	{
+   foreach (GameObject notebook in notebookPickups)
+    {
+        if (notebook != null)
+        {
+            Transform t = notebook.transform;
+            t.position = new Vector3(t.position.x, t.position.y + 20, t.position.z);
+        }
+    }
+	}
+
 
 	// Token: 0x040005F7 RID: 1527
 	public CursorControllerScript cursorController;
@@ -954,6 +971,8 @@ private void TransparentMaterial(string tagName, Material material)
 
 	// Token: 0x04000724 RID: 8723
 	public int maxNotebooks;
+
+	public int maxNotebooks2;
 
 	// Token: 0x04000614 RID: 1556
 	public GameObject[] notebookPickups;
@@ -1266,6 +1285,8 @@ public AudioClip YTPsSound;
      public Material transparent;
      public NullScript NullScript;
      public bool FloorAndCeiling;
+	 public bool ShakingWalls;
+	 public GameObject ShakeWall;
 
 
     [Header("Controllers")]  
